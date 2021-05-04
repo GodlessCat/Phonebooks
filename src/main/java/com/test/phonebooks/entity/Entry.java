@@ -1,6 +1,8 @@
 package com.test.phonebooks.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -16,13 +18,14 @@ import javax.persistence.*;
 public class Entry {
 
     @Id
-    @SequenceGenerator( name = "jpaSequence", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1, initialValue = 1 )
-    @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "jpaSequence")
-    long id;
+    @SequenceGenerator(name = "jpaSequence", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1, initialValue = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "jpaSequence")
+    long entry_id;
 
+    @ManyToOne
     @NonNull
-    @Column(name = "ENTRY_OWNER_ID")
-    long ownerID;
+    @JoinColumn(name = "user_id")
+    User user;
 
     @NonNull
     @Column(name = "ENTRY_NAME")

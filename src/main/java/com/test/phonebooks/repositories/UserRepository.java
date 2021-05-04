@@ -1,4 +1,4 @@
-package com.test.phonebooks.repository;
+package com.test.phonebooks.repositories;
 
 import com.test.phonebooks.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +11,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByNameContaining(String name);
 
-    //List<PhoneNote> findByNumber(String number);
 }
