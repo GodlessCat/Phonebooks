@@ -45,21 +45,6 @@ public class EntryTest {
 
     }
 
-//    @Test
-//    public void test_showing_all_entries() {
-////        User user1 = userRepository.save(new User("John"));
-//
-//        Entry entry1 = new Entry(1, "Jack", "+79123456789");
-//        entityManager.persist(entry1);
-//
-////        Entry entry2 = entryRepository.save(new Entry(user1.getUserId(), "Jack", "+79123456789"));
-//
-//        Iterable<Entry> entries = entryRepository.findAll();
-//
-//        assertThat(entries).hasSize(2).contains(entry1);
-//
-//    }
-
     @Test
     public void test_showing_entry_by_id() {
         Entry entry1 = new Entry(1, "Jack", "+79123456789");
@@ -70,19 +55,6 @@ public class EntryTest {
         assertThat(foundEntry).isEqualTo(entry1);
     }
 
-//    @Test
-//    public void test_showing_entries_by_number() {
-//        Entry entry1 = new Entry(1, "Jack", "+79123456789");
-//        entityManager.persist(entry1);
-//
-//        Entry entry2 = new Entry(1, "Jack", "+79321654987");
-//        entityManager.persist(entry2);
-//
-//        Iterable<Entry> entries = entryRepository.findByNumber("+79123456789");
-//
-//        assertThat(entries).hasSize(1).contains(entry1);
-//    }
-//
     @Test
     public void test_update_enry_by_id() {
         Entry entry1 = new Entry(1, "Jack", "+79123456789");
@@ -102,19 +74,4 @@ public class EntryTest {
         assertThat(checkEntry.getName()).isEqualTo(entry1.getName());
         assertThat(checkEntry.getNumber()).isEqualTo(entry1.getNumber());
     }
-
-//    @Test
-//    public void test_delete_user_by_id() {
-//        Entry entry1 = new Entry(1, "Jack", "+79123456789");
-//        entityManager.persist(entry1);
-//
-//        Entry entry2 = new Entry(1, "Jack", "+79321654987");
-//        entityManager.persist(entry1);
-//
-//        entryRepository.deleteById(entry1.getEntryId());
-//
-//        Iterable<Entry> entries = entryRepository.findAll();
-//
-//        assertThat(entries).hasSize(1).contains(entry2);
-//    }
 }

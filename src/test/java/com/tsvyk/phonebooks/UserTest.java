@@ -113,18 +113,4 @@ public class UserTest {
 
         assertThat(users).hasSize(1).contains(user1);
     }
-
-//    @Test
-//    public void test_showing_all_entries_by_user_id() {
-//        User user1 = userRepository.save(new User("Jack"));
-//        User user2 = userRepository.save(new User("John"));
-//
-//        Entry entry1 = entryRepository.save(new Entry(user1.getUserId(), "John", "+79123456789"));
-//        Entry entry2 = entryRepository.save(new Entry(user2.getUserId(), "Joe", "+79987654321"));
-//        Entry entry3 = entryRepository.save(new Entry(user1.getUserId(), "Bill", "+79654987321"));
-//
-//
-//        Iterable<Entry> foundEntries = entryRepository.findByUserId((Long) entityManager.getId(user1));
-//        assertThat(foundEntries).hasSize(2).contains(entry1, entry3);
-//    }
 }
