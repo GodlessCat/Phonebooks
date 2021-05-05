@@ -1,7 +1,7 @@
-package com.test.phonebooks.repositories;
+package com.tsvyk.phonebooks.repositories;
 
-import com.test.phonebooks.entity.Entry;
-import com.test.phonebooks.entity.User;
+import com.tsvyk.phonebooks.models.Entry;
+import com.tsvyk.phonebooks.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface EntryRepository extends JpaRepository<Entry, Long> {
 
     List<Entry> findByNumber(String number);
-    List<Entry> findByUser(Optional<User> user);
+    List<Entry> findByUserId(long id);
 }
 

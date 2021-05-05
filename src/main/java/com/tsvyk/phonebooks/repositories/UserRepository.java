@@ -1,9 +1,8 @@
-package com.test.phonebooks.repositories;
+package com.tsvyk.phonebooks.repositories;
 
-import com.test.phonebooks.entity.User;
+import com.tsvyk.phonebooks.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository

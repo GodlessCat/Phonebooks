@@ -1,4 +1,4 @@
-package com.test.phonebooks;
+package com.tsvyk.phonebooks;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

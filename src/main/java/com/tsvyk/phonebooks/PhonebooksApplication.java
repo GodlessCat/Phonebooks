@@ -1,4 +1,4 @@
-package com.test.phonebooks;
+package com.tsvyk.phonebooks;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,5 +9,4 @@ public class PhonebooksApplication {
     public static void main(String[] args) {
         SpringApplication.run(PhonebooksApplication.class, args);
     }
-
 }

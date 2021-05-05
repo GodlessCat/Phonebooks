@@ -1,8 +1,6 @@
-package com.test.phonebooks.entity;
-
+package com.tsvyk.phonebooks.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -19,13 +17,13 @@ public class Entry {
 
     @Id
     @SequenceGenerator(name = "jpaSequence", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1, initialValue = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "jpaSequence")
-    long entry_id;
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "jpaSequence")
+    long entryId;
 
-    @ManyToOne
     @NonNull
-    @JoinColumn(name = "user_id")
-    User user;
+    @JsonIgnore
+    @Column(name = "USER_ID")
+    long userId;
 
     @NonNull
     @Column(name = "ENTRY_NAME")
