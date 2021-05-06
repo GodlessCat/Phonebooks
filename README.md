@@ -13,7 +13,7 @@ Or run the following command in a terminal window (in the complete) directory:
 * Update User By Id - PUT: http://localhost:8080/users/{user_id}
 * Delete User By Id - DELETE: http://localhost:8080/users/{user_id}
 * Create Entry - POST: http://localhost:8080/users/{user_id}/entries
-* Get All Entries - GET: http://localhost:8080/entries
+* Get All Entries - GET: http://localhost:8080/entries or http://localhost:8080/entries?number={number}
 * Get Entry By Id - GET: http://localhost:8080/entries/{entry_id}
 * Get All Entries By User Id - GET: http://localhost:8080/users/{user_id}/entries
 * Update Entry By Id - PUT: http://localhost:8080/entries/{entry_id}
