@@ -8,7 +8,7 @@ Or run the following command in a terminal window (in the complete) directory:
 
 ## List of API commands:
 * Create Users - POST: http://localhost:8080/users
-* Get All Users - GET: http://localhost:8080/users
+* Get All Users - GET: http://localhost:8080/users or http://localhost:8080/users?name={string}
 * Get User By Id - GET: http://localhost:8080/users/{user_id}
 * Update User By Id - PUT: http://localhost:8080/users/{user_id}
 * Delete User By Id - DELETE: http://localhost:8080/users/{user_id}
