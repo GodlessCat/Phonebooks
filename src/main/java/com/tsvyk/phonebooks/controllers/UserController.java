@@ -1,36 +1,35 @@
 package com.tsvyk.phonebooks.controllers;
 
+import com.tsvyk.phonebooks.dto.entry.EntryRequest;
+import com.tsvyk.phonebooks.dto.entry.EntryResponse;
+import com.tsvyk.phonebooks.dto.user.UserRequest;
+import com.tsvyk.phonebooks.dto.user.UserResponse;
 import com.tsvyk.phonebooks.models.Entry;
-import com.tsvyk.phonebooks.models.User;
-import com.tsvyk.phonebooks.repositories.EntryRepository;
-import com.tsvyk.phonebooks.repositories.UserRepository;
+import com.tsvyk.phonebooks.services.EntryService;
+import com.tsvyk.phonebooks.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("users")
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private EntryRepository entryRepository;
+    private EntryService entryService;
 
     @GetMapping("")
-    public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) {
-        try {
-            List<User> users;
+    public ResponseEntity<List<UserResponse>> getAllUsers(@RequestParam(required = false) String name) {
 
-            if (name == null) {
-                users = userRepository.findAll();
-            } else {
-                users = userRepository.findByNameContaining(name);
-            }
+        try {
+
+            List<UserResponse> users = userService.getAllUsers(name);
 
             if (users.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -44,12 +43,14 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable("userId") long userId) {
-        try {
-            Optional<User> user = userRepository.findById(userId);
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("userId") long userId) {
 
-            if (user.isPresent()) {
-                return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        try {
+
+            UserResponse user = userService.getUserById(userId);
+
+            if (user != null) {
+                return new ResponseEntity<>(user, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -59,10 +60,11 @@ public class UserController {
     }
 
     @PostMapping("")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) {
 
         try {
-            User newUser = userRepository.saveAndFlush(new User(user.getName()));
+
+            UserResponse newUser = userService.createUser(userRequest);
 
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -71,17 +73,11 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable("userId") long userId, @RequestBody User updateUser) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("userId") long userId, @RequestBody UserRequest updateUser) {
+
         try {
-            Optional<User> user = userRepository.findById(userId);
 
-            User newUser = null;
-
-            if (user.isPresent()) {
-                newUser = user.get();
-                newUser.setName(updateUser.getName());
-                userRepository.save(newUser);
-            }
+            UserResponse newUser = userService.updateUser(userId, updateUser);
 
             if (newUser != null) {
                 return new ResponseEntity<>(newUser, HttpStatus.OK);
@@ -95,9 +91,11 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("userId") long userId) {
+
         try {
-            userRepository.deleteById(userId);
-            entryRepository.deleteAll(entryRepository.findByUserId(userId));
+
+            userService.deleteUser(userId);
+
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -105,14 +103,11 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/entries")
-    public ResponseEntity<Entry> createEntry(@PathVariable("userId") long userId, @RequestBody Entry entry) {
-        try {
-            Optional<User> user = userRepository.findById(userId);
-            Entry newEntry = null;
+    public ResponseEntity<EntryResponse> createEntry(@PathVariable("userId") long userId, @RequestBody EntryRequest entryRequest) {
 
-            if (user.isPresent()) {
-                newEntry = entryRepository.saveAndFlush(new Entry(user.get().getUserId(), entry.getName(), entry.getNumber()));
-            }
+        try {
+
+            EntryResponse newEntry = userService.createEntry(userId, entryRequest);
 
             if (newEntry == null) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -126,11 +121,11 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/entries")
-    public ResponseEntity<List<Entry>> getAllEntriesByUserId(@PathVariable(name = "userId") long userId) {
+    public ResponseEntity<List<EntryResponse>> getAllEntriesByUserId(@PathVariable(name = "userId") long userId) {
 
         try {
 
-            List<Entry> entries = entryRepository.findByUserId(userId);
+            List<EntryResponse> entries = userService.getAllEntriesByUserId(userId);
 
             if (entries.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
