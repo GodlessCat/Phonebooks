@@ -16,15 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class EntryServiceImpl implements EntryService {
 
+    @Autowired
     EntryRepository entryRepository;
 
     @Autowired
     MappingUtils mappingUtils;
-
-    @Autowired
-    public void setEntryRepository(EntryRepository entryRepository){
-        this.entryRepository = entryRepository;
-    }
 
     @Override
     public List<EntryResponse> getAllEntries(String number) {

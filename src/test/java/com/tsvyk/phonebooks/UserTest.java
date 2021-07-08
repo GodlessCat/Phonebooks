@@ -1,12 +1,11 @@
 package com.tsvyk.phonebooks;
 
-import com.tsvyk.phonebooks.dto.user.UserRequest;
+
 import com.tsvyk.phonebooks.dto.user.UserResponse;
 import com.tsvyk.phonebooks.models.User;
 import com.tsvyk.phonebooks.repositories.UserRepository;
 import com.tsvyk.phonebooks.services.impl.UserServiceImpl;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import com.tsvyk.phonebooks.utils.MappingUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,18 +13,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class UserTest {
@@ -33,48 +28,53 @@ public class UserTest {
     @Mock
     private UserRepository userRepository;
 
-    @Autowired
     @InjectMocks
     private UserServiceImpl userService;
 
+    @InjectMocks
+    private MappingUtils mappingUtils;
+
+    @Test
+    public void GivenGetAllUsersShouldReturnListOfAllUsers(){
+
+        when(userRepository.findAll()).thenReturn(Arrays.asList(
+                new User("John"),
+                new User("Jack")
+        ));
+
+        List<UserResponse> allUsers = userService.getAllUsers(null);
+
+        assertEquals("John", allUsers.get(0).getName());
+        assertEquals("Jack", allUsers.get(1).getName());
+
+    }
+
+
 //    @Test
-//    public void GivenGetAllUsersShouldReturnListOfAllUsers(){
-//        userRepository.save(user1);
-//        //stubbing mock to return specific data
+//    public void savedUser_Success() {
 //
-//        when(userRepository.findAll()).thenReturn(users);
-//        List<UserResponse> userList = userService.getAllUsers("");
-//        assertEquals(userList, users);
+//        UserRequest userRequest = new UserRequest();
+//        userRequest.setName("John");
+//        userRequest.setUserId(1);
 //
-//        verify(userRepository,times(1)).save(user1);
-//        verify(userRepository,times(1)).findAll();
+//        when(userRepository.save(any(User.class))).thenReturn(new User());
+//
+//        UserResponse created = userService.createUser(userRequest);
 //    }
 
-    @Test
-    public void savedUser_Success() {
-        User user = new User("John");
-
-        UserRequest userRequest = new UserRequest("John");
-
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        UserResponse savedUser = userService.createUser(userRequest);
-        assertThat(savedUser.getName()).isNotNull();
-    }
-
-    @Test
-    public void customer_exists_in_db_success() {
-        User user = new User();
-        user.setName("John");
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-
-        // providing knowledge
-        when(userRepository.findAll()).thenReturn(userList);
-
-        List<UserResponse> users = userService.getAllUsers("");
-        assertThat(users.size()).isGreaterThan(0);
-    }
+//    @Test
+//    public void customer_exists_in_db_success() {
+//        User user = new User();
+//        user.setName("John");
+//        List<User> userList = new ArrayList<>();
+//        userList.add(user);
+//
+//        // providing knowledge
+//        when(userRepository.findAll()).thenReturn(userList);
+//
+//        List<UserResponse> users = userService.getAllUsers("");
+//        assertThat(users.size()).isGreaterThan(0);
+//    }
 
 //
 //    @Test

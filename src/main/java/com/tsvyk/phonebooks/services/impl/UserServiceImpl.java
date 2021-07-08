@@ -56,10 +56,13 @@ public class UserServiceImpl implements UserService {
         User newUser = new User();
         newUser.setName(userRequest.getName());
 
-        userRepository.save(newUser);
+        User resUser = userRepository.save(newUser);
 
+        UserResponse userResponse = mappingUtils.mapToUserResponse(resUser);
 
-        return mappingUtils.mapToUserResponse(newUser);
+        System.out.println(userResponse);
+
+        return userResponse;
     }
 
     @Override
