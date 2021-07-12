@@ -13,7 +13,7 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
 
     List<Entry> findByUserId(long id);
 
-    List<Entry> findByEntryId(long id);
+    Entry findByEntryId(long id);
 
 }
 

@@ -3,12 +3,14 @@ package com.tsvyk.phonebooks.controllers;
 import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.services.EntryService;
+import com.tsvyk.phonebooks.utils.MappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("entries")
@@ -17,12 +19,17 @@ public class EntryController {
     @Autowired
     private EntryService entryService;
 
+    @Autowired
+    private MappingUtils mappingUtils;
+
     @GetMapping("")
     public ResponseEntity<List<EntryResponse>> getAllEntries(@RequestParam(required = false) String number) {
 
         try {
 
-            List<EntryResponse> entries = entryService.getAllEntries(number);
+            List<EntryResponse> entries = entryService.getAllEntries(number).
+                    stream().map(mappingUtils::mapToEntryResponse).collect(Collectors.toList());
+            ;
 
             if (entries.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -39,7 +46,7 @@ public class EntryController {
     public ResponseEntity<EntryResponse> getEntryById(@PathVariable(name = "entryId") long entryId) {
 
         try {
-            EntryResponse entry = entryService.getEntryById(entryId);
+            EntryResponse entry = mappingUtils.mapToEntryResponse(entryService.getEntryById(entryId));
 
             if (entry != null) {
                 return new ResponseEntity<>(entry, HttpStatus.OK);
@@ -52,10 +59,11 @@ public class EntryController {
     }
 
     @PutMapping("/{entryId}")
-    public ResponseEntity<EntryResponse> updateEntry(@PathVariable("entryId") long entryId, @RequestBody EntryRequest entryRequest) {
+    public ResponseEntity<EntryResponse> updateEntry(@PathVariable("entryId") long entryId,
+                                                     @RequestBody EntryRequest entryRequest) {
 
         try {
-            EntryResponse newEntry = entryService.updateEntry(entryId, entryRequest);
+            EntryResponse newEntry = mappingUtils.mapToEntryResponse(entryService.updateEntry(entryId, entryRequest));
 
             if (newEntry != null) {
                 return new ResponseEntity<>(newEntry, HttpStatus.OK);

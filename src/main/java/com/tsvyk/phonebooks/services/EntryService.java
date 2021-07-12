@@ -2,16 +2,17 @@ package com.tsvyk.phonebooks.services;
 
 import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.entry.EntryResponse;
+import com.tsvyk.phonebooks.models.Entry;
 
 import java.util.List;
 
 public interface EntryService {
 
-    List<EntryResponse> getAllEntries(String number);
+    List<Entry> getAllEntries(String number);
 
-    EntryResponse getEntryById(long id);
+    Entry getEntryById(long id);
 
-    EntryResponse updateEntry(long id, EntryRequest entryRequest);
+    Entry updateEntry(long id, EntryRequest entryRequest);
 
     void deleteEntryById(long id);
 }

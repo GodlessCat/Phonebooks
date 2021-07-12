@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class EntryServiceImpl implements EntryService {
@@ -23,42 +22,38 @@ public class EntryServiceImpl implements EntryService {
     MappingUtils mappingUtils;
 
     @Override
-    public List<EntryResponse> getAllEntries(String number) {
+    public List<Entry> getAllEntries(String number) {
 
         List<Entry> entries = null;
 
         if (number == null) {
             entries = entryRepository.findAll();
-        } else{
+        } else {
             entries = entryRepository.findByNumber(number);
         }
 
-        return entries.stream().map(mappingUtils::mapToEntryResponse).collect(Collectors.toList());
+        return entries;
     }
 
     @Override
-    public EntryResponse getEntryById(long id) {
+    public Entry getEntryById(long id) {
 
-        return mappingUtils.mapToEntryResponse(entryRepository.findByEntryId(id).get(0));
+        return entryRepository.findByEntryId(id);
     }
 
     @Override
-    public EntryResponse updateEntry(long id, EntryRequest entryRequest) {
+    public Entry updateEntry(long id, EntryRequest entryRequest) {
 
-        Optional<Entry> entry = entryRepository.findById(id);
+        Entry entry = entryRepository.findByEntryId(id);
 
-        Entry newEntry = null;
+        if (entry != null) {
 
-        if (entry.isPresent()) {
+            entry.setName(entryRequest.getName());
+            entry.setNumber(entryRequest.getNumber());
 
-            newEntry = entry.get();
-            newEntry.setName(entryRequest.getName());
-            newEntry.setName(entryRequest.getNumber());
-
-            entryRepository.save(newEntry);
+            entryRepository.save(entry);
         }
-
-        return getEntryById(id);
+        return entryRepository.findByEntryId(id);
     }
 
     @Override

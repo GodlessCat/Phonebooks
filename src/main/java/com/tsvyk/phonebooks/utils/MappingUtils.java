@@ -4,15 +4,10 @@ import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.dto.user.UserResponse;
 import com.tsvyk.phonebooks.models.Entry;
 import com.tsvyk.phonebooks.models.User;
-import com.tsvyk.phonebooks.repositories.EntryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MappingUtils {
-
-    @Autowired
-    EntryRepository entryRepository;
 
     public EntryResponse mapToEntryResponse(Entry entry) {
 

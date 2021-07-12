@@ -1,9 +1,7 @@
 package com.tsvyk.phonebooks.services.impl;
 
 import com.tsvyk.phonebooks.dto.entry.EntryRequest;
-import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.dto.user.UserRequest;
-import com.tsvyk.phonebooks.dto.user.UserResponse;
 import com.tsvyk.phonebooks.models.Entry;
 import com.tsvyk.phonebooks.models.User;
 import com.tsvyk.phonebooks.repositories.EntryRepository;
@@ -14,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,7 +26,7 @@ public class UserServiceImpl implements UserService {
     MappingUtils mappingUtils;
 
     @Override
-    public List<UserResponse> getAllUsers(String name) {
+    public List<User> getAllUsers(String name) {
 
         List<User> users;
 
@@ -41,46 +37,37 @@ public class UserServiceImpl implements UserService {
         }
 
 
-        return users.stream().map(mappingUtils::mapToUserResponse).collect(Collectors.toList());
+        return users;
     }
 
     @Override
-    public UserResponse getUserById(long id) {
+    public User getUserById(long id) {
 
-        return mappingUtils.mapToUserResponse(userRepository.findByUserId(id));
+        return userRepository.findByUserId(id);
     }
 
     @Override
-    public UserResponse createUser(UserRequest userRequest) {
+    public User createUser(UserRequest userRequest) {
 
         User newUser = new User();
         newUser.setName(userRequest.getName());
 
-        User resUser = userRepository.save(newUser);
-
-        UserResponse userResponse = mappingUtils.mapToUserResponse(resUser);
-
-        System.out.println(userResponse);
-
-        return userResponse;
+        return userRepository.save(newUser);
     }
 
     @Override
-    public UserResponse updateUser(long id, UserRequest userRequest) {
+    public User updateUser(long id, UserRequest userRequest) {
 
-        Optional<User> user = userRepository.findById(id);
+        User user = userRepository.findByUserId(id);
 
-        User newUser = null;
+        if (user != null) {
 
-        if (user.isPresent()) {
+            user.setName(userRequest.getName());
 
-            newUser = user.get();
-            newUser.setName(userRequest.getName());
-
-            userRepository.save(newUser);
+            userRepository.save(user);
         }
 
-        return getUserById(id);
+        return userRepository.findByUserId(id);
     }
 
     @Override
@@ -91,24 +78,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public EntryResponse createEntry(long userId, EntryRequest entryRequest) {
+    public Entry createEntry(long userId, EntryRequest entryRequest) {
 
-        Optional<User> user = userRepository.findById(userId);
+        User user = userRepository.findByUserId(userId);
+
         Entry newEntry = null;
 
-        if (user.isPresent()) {
-            newEntry = entryRepository.saveAndFlush(new Entry(user.get().getUserId(), entryRequest.getName(), entryRequest.getNumber()));
+        if (user != null) {
+            newEntry = entryRepository.save(new Entry(user.getUserId(),
+                    entryRequest.getName(),
+                    entryRequest.getNumber()));
         }
 
-        return mappingUtils.mapToEntryResponse(newEntry);
+        return newEntry;
     }
 
     @Override
-    public List<EntryResponse> getAllEntriesByUserId(long id) {
+    public List<Entry> getAllEntriesByUserId(long id) {
 
         List<Entry> entries = entryRepository.findByUserId(id);
 
-        return entries.stream().map(mappingUtils::mapToEntryResponse).collect(Collectors.toList());
-
+        return entries;
     }
 }

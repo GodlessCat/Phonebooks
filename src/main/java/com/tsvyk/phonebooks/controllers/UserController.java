@@ -4,16 +4,16 @@ import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.dto.user.UserRequest;
 import com.tsvyk.phonebooks.dto.user.UserResponse;
-import com.tsvyk.phonebooks.models.Entry;
-import com.tsvyk.phonebooks.models.User;
 import com.tsvyk.phonebooks.services.EntryService;
 import com.tsvyk.phonebooks.services.UserService;
+import com.tsvyk.phonebooks.utils.MappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("users")
@@ -25,12 +25,16 @@ public class UserController {
     @Autowired
     private EntryService entryService;
 
+    @Autowired
+    private MappingUtils mappingUtils;
+
     @GetMapping("")
     public ResponseEntity<List<UserResponse>> getAllUsers(@RequestParam(required = false) String name) {
 
         try {
 
-            List<UserResponse> users = userService.getAllUsers(name);
+            List<UserResponse> users = userService.getAllUsers(name).
+                    stream().map(mappingUtils::mapToUserResponse).collect(Collectors.toList());;
 
             if (users.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -48,7 +52,7 @@ public class UserController {
 
         try {
 
-            UserResponse user = userService.getUserById(userId);
+            UserResponse user = mappingUtils.mapToUserResponse(userService.getUserById(userId));
 
             if (user != null) {
                 return new ResponseEntity<>(user, HttpStatus.OK);
@@ -65,7 +69,7 @@ public class UserController {
 
         try {
 
-            UserResponse newUser = userService.createUser(userRequest);
+            UserResponse newUser = mappingUtils.mapToUserResponse(userService.createUser(userRequest));
 
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -74,11 +78,12 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable("userId") long userId, @RequestBody UserRequest updateUser) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("userId") long userId,
+                                                   @RequestBody UserRequest updateUser) {
 
         try {
 
-            UserResponse newUser = userService.updateUser(userId, updateUser);
+            UserResponse newUser = mappingUtils.mapToUserResponse(userService.updateUser(userId, updateUser));
 
             if (newUser != null) {
                 return new ResponseEntity<>(newUser, HttpStatus.OK);
@@ -104,11 +109,12 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/entries")
-    public ResponseEntity<EntryResponse> createEntry(@PathVariable("userId") long userId, @RequestBody EntryRequest entryRequest) {
+    public ResponseEntity<EntryResponse> createEntry(@PathVariable("userId") long userId,
+                                                     @RequestBody EntryRequest entryRequest) {
 
         try {
 
-            EntryResponse newEntry = userService.createEntry(userId, entryRequest);
+            EntryResponse newEntry = mappingUtils.mapToEntryResponse(userService.createEntry(userId, entryRequest));
 
             if (newEntry == null) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -126,7 +132,8 @@ public class UserController {
 
         try {
 
-            List<EntryResponse> entries = userService.getAllEntriesByUserId(userId);
+            List<EntryResponse> entries = userService.getAllEntriesByUserId(userId).
+                    stream().map(mappingUtils::mapToEntryResponse).collect(Collectors.toList());
 
             if (entries.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -1,177 +1,145 @@
 package com.tsvyk.phonebooks;
 
-
-import com.tsvyk.phonebooks.dto.user.UserResponse;
+import com.tsvyk.phonebooks.dto.entry.EntryRequest;
+import com.tsvyk.phonebooks.dto.user.UserRequest;
+import com.tsvyk.phonebooks.models.Entry;
 import com.tsvyk.phonebooks.models.User;
+import com.tsvyk.phonebooks.repositories.EntryRepository;
 import com.tsvyk.phonebooks.repositories.UserRepository;
 import com.tsvyk.phonebooks.services.impl.UserServiceImpl;
-import com.tsvyk.phonebooks.utils.MappingUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class UserTest {
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
-    @InjectMocks
+    @Autowired
     private UserServiceImpl userService;
 
-    @InjectMocks
-    private MappingUtils mappingUtils;
+    @MockBean
+    private EntryRepository entryRepository;
 
     @Test
-    public void GivenGetAllUsersShouldReturnListOfAllUsers(){
+    @DisplayName("Test find all users")
+    void testFindAll() {
 
-        when(userRepository.findAll()).thenReturn(Arrays.asList(
-                new User("John"),
-                new User("Jack")
-        ));
+        User user1 = new User("John");
+        User user2 = new User("Jack");
 
-        List<UserResponse> allUsers = userService.getAllUsers(null);
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
 
-        assertEquals("John", allUsers.get(0).getName());
-        assertEquals("Jack", allUsers.get(1).getName());
+        List<User> users = userService.getAllUsers(null);
 
+        assertEquals(2, users.size());
+        assertEquals("John", users.get(0).getName());
+        assertEquals("Jack", users.get(1).getName());
+
+        verify(userRepository, times(1)).findAll();
     }
 
 
-//    @Test
-//    public void savedUser_Success() {
-//
-//        UserRequest userRequest = new UserRequest();
-//        userRequest.setName("John");
-//        userRequest.setUserId(1);
-//
-//        when(userRepository.save(any(User.class))).thenReturn(new User());
-//
-//        UserResponse created = userService.createUser(userRequest);
-//    }
+    @Test
+    @DisplayName("Test find user by id")
+    void testFindById() {
 
-//    @Test
-//    public void customer_exists_in_db_success() {
-//        User user = new User();
-//        user.setName("John");
-//        List<User> userList = new ArrayList<>();
-//        userList.add(user);
-//
-//        // providing knowledge
-//        when(userRepository.findAll()).thenReturn(userList);
-//
-//        List<UserResponse> users = userService.getAllUsers("");
-//        assertThat(users.size()).isGreaterThan(0);
-//    }
+        when(userRepository.findByUserId(0L)).thenReturn(new User("John"));
 
-//
-//    @Test
-//    public void test_showing_no_content_if_no_entries_was_creating() {
-//
-//        List<EntryResponse> entries = entryService.getAllEntries("8");
-//
-//        assertThat(entries).isEmpty();
-//
-//    }
-//
-//    @Test
-//    public void test_showing_no_content_if_no_users_was_creating() {
-//        Iterable<User> users = userRepository.findAll();
-//
-//        assertThat(users).isEmpty();
-//    }
-//
-//    @Test
-//    public void test_save_a_new_user() {
-//        User user = userRepository.save(new User("John"));
-//
-//        assertThat(user).hasFieldOrPropertyWithValue("name", "John");
-//    }
-//
-//    @Test
-//    public void test_showing_all_users() {
-//        User user1 = new User("John");
-//        entityManager.persist(user1);
-//
-//        User user2 = new User("Jack");
-//        entityManager.persist(user2);
-//
-//        Iterable<User> users = userRepository.findAll();
-//
-//        assertThat(users).hasSize(2).contains(user1, user2);
-//    }
-//
-//    @Test
-//    public void test_showing_user_by_id() {
-//        User user1 = new User("John");
-//        entityManager.persist(user1);
-//
-//        User user2 = new User("Jack");
-//        entityManager.persist(user2);
-//
-//        User foundUser = userRepository.findById(user2.getUserId()).get();
-//
-//        assertThat(foundUser).isEqualTo(user2);
-//    }
-//
-//    @Test
-//    public void test_showing_users_by_part_of_name() {
-//        User user1 = new User("John");
-//        entityManager.persist(user1);
-//
-//        User user2 = new User("Jack");
-//        entityManager.persist(user2);
-//
-//        User user3 = new User("Joe");
-//        entityManager.persist(user3);
-//
-//
-//        Iterable<User> users = userRepository.findByNameContaining("Jo");
-//
-//        assertThat(users).hasSize(2).contains(user1, user3);
-//    }
-//
-//    @Test
-//    public void test_update_user_by_id() {
-//        User user1 = new User("John");
-//        entityManager.persist(user1);
-//
-//        User updatedUser = new User("Joe");
-//
-//        User user = userRepository.findById(user1.getUserId()).get();
-//        user.setName(updatedUser.getName());
-//        userRepository.save(user);
-//
-//        User checkUser = userRepository.findById(user1.getUserId()).get();
-//
-//        assertThat(checkUser.getUserId()).isEqualTo(user1.getUserId());
-//        assertThat(checkUser.getName()).isEqualTo(user1.getName());
-//    }
-//
-//    @Test
-//    public void test_delete_user_by_id() {
-//        User user1 = new User("John");
-//        entityManager.persist(user1);
-//
-//        User user2 = new User("Jack");
-//        entityManager.persist(user2);
-//
-//        userRepository.deleteById(user2.getUserId());
-//
-//        Iterable<User> users = userRepository.findAll();
-//
-//        assertThat(users).hasSize(1).contains(user1);
-//    }
+        User userById = userService.getUserById(0L);
+
+        assertEquals("John", userById.getName());
+        verify(userRepository, times(1)).findByUserId(0L);
+    }
+
+    @Test
+    @DisplayName("Test create user")
+    public void testCreateUser() {
+
+        UserRequest userRequest = new UserRequest();
+        userRequest.setName("John");
+
+        when(userRepository.save(any())).thenReturn(new User("John"));
+
+        User created = userService.createUser(userRequest);
+
+        assertEquals("John", created.getName());
+        verify(userRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Test update user")
+    public void testUpdateUser() {
+
+        UserRequest userRequest = new UserRequest();
+        userRequest.setName("John");
+
+        when(userRepository.findByUserId(0L)).thenReturn(new User("Steve"));
+        when(userRepository.save(any())).thenReturn(new User("John"));
+
+        User updated = userService.updateUser(0L, userRequest);
+
+        assertEquals("John", updated.getName());
+
+        verify(userRepository, times(2)).findByUserId(0L);
+        verify(userRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Test delete user")
+    public void testDeleteUser() {
+
+        userService.deleteUser(0L);
+
+        verify(userRepository, times(1)).deleteById(0L);
+    }
+
+    @Test
+    @DisplayName("Test create entry")
+    public void testCreateEntry() {
+
+        EntryRequest entryRequest = new EntryRequest();
+        entryRequest.setName("Jack");
+        entryRequest.setNumber("88005553535");
+
+        when(userRepository.findByUserId(0L)).thenReturn(new User("John"));
+        when(entryRepository.save(any())).thenReturn(new Entry(0, "Jack", "88005553535"));
+
+        Entry created = userService.createEntry(0L, entryRequest);
+
+        assertEquals("Jack", created.getName());
+        verify(userRepository, times(1)).findByUserId(0L);
+        verify(entryRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Test get all entry by user id")
+    public void testGetAllEntryByUserId() {
+
+        Entry entry1 = new Entry(0, "Jack", "88005553535");
+        Entry entry2 = new Entry(0, "John", "89623822238");
+        Entry entry3 = new Entry(1, "John", "89623822238");
+
+        when(entryRepository.findByUserId(0L)).thenReturn(Arrays.asList(entry1, entry2));
+
+        List<Entry> entries = userService.getAllEntriesByUserId(0L);
+
+        assertEquals(2, entries.size());
+        assertEquals("Jack", entries.get(0).getName());
+        assertEquals("John", entries.get(1).getName());
+
+        verify(entryRepository, times(1)).findByUserId(0L);
+
+    }
 }
