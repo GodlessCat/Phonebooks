@@ -96,8 +96,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Entry> getAllEntriesByUserId(long id) {
 
-        List<Entry> entries = entryRepository.findByUserId(id);
-
-        return entries;
+        return entryRepository.findByUserId(id);
     }
 }

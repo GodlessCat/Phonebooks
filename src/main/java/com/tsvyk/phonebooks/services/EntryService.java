@@ -1,7 +1,6 @@
 package com.tsvyk.phonebooks.services;
 
 import com.tsvyk.phonebooks.dto.entry.EntryRequest;
-import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.models.Entry;
 
 import java.util.List;

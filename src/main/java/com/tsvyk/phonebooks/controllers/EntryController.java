@@ -29,7 +29,6 @@ public class EntryController {
 
             List<EntryResponse> entries = entryService.getAllEntries(number).
                     stream().map(mappingUtils::mapToEntryResponse).collect(Collectors.toList());
-            ;
 
             if (entries.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);

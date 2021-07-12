@@ -4,7 +4,6 @@ import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.dto.user.UserRequest;
 import com.tsvyk.phonebooks.dto.user.UserResponse;
-import com.tsvyk.phonebooks.services.EntryService;
 import com.tsvyk.phonebooks.services.UserService;
 import com.tsvyk.phonebooks.utils.MappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,6 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private EntryService entryService;
-
-    @Autowired
     private MappingUtils mappingUtils;
 
     @GetMapping("")
@@ -34,7 +30,7 @@ public class UserController {
         try {
 
             List<UserResponse> users = userService.getAllUsers(name).
-                    stream().map(mappingUtils::mapToUserResponse).collect(Collectors.toList());;
+                    stream().map(mappingUtils::mapToUserResponse).collect(Collectors.toList());
 
             if (users.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);

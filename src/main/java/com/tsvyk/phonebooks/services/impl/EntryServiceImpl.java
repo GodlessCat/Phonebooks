@@ -1,7 +1,6 @@
 package com.tsvyk.phonebooks.services.impl;
 
 import com.tsvyk.phonebooks.dto.entry.EntryRequest;
-import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.models.Entry;
 import com.tsvyk.phonebooks.repositories.EntryRepository;
 import com.tsvyk.phonebooks.services.EntryService;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EntryServiceImpl implements EntryService {
@@ -24,7 +22,7 @@ public class EntryServiceImpl implements EntryService {
     @Override
     public List<Entry> getAllEntries(String number) {
 
-        List<Entry> entries = null;
+        List<Entry> entries;
 
         if (number == null) {
             entries = entryRepository.findAll();

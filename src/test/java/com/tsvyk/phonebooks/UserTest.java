@@ -129,7 +129,6 @@ public class UserTest {
 
         Entry entry1 = new Entry(0, "Jack", "88005553535");
         Entry entry2 = new Entry(0, "John", "89623822238");
-        Entry entry3 = new Entry(1, "John", "89623822238");
 
         when(entryRepository.findByUserId(0L)).thenReturn(Arrays.asList(entry1, entry2));
 
