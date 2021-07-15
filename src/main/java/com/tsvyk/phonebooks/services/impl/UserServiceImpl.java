@@ -8,7 +8,6 @@ import com.tsvyk.phonebooks.models.User;
 import com.tsvyk.phonebooks.repositories.EntryRepository;
 import com.tsvyk.phonebooks.repositories.UserRepository;
 import com.tsvyk.phonebooks.services.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +22,11 @@ public class UserServiceImpl implements UserService {
 
     private final EntryRepository entryRepository;
 
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, EntryRepository entryRepository, ModelMapper modelMapper) {
+    public UserServiceImpl(UserRepository userRepository, EntryRepository entryRepository) {
         this.userRepository = userRepository;
         this.entryRepository = entryRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -50,7 +47,7 @@ public class UserServiceImpl implements UserService {
         List<UserResponse> userResponses = new ArrayList<>();
 
         for (User user : users) {
-            userResponses.add(modelMapper.map(user, UserResponse.class));
+            userResponses.add(UserResponse.from(user));
         }
 
         return userResponses;
@@ -65,16 +62,18 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException();
         }
 
-        return modelMapper.map(user.get(), UserResponse.class);
+        return UserResponse.from(user.get());
     }
 
     @Override
     public UserResponse createUser(UserRequest userRequest) {
 
-        User newUser = new User();
-        newUser.setName(userRequest.getName());
+        User user = new User();
+        user.setName(userRequest.getName());
 
-        return modelMapper.map(userRepository.save(newUser), UserResponse.class);
+        userRepository.save(user);
+
+        return UserResponse.from(user);
     }
 
     @Override
@@ -88,7 +87,9 @@ public class UserServiceImpl implements UserService {
 
         user.get().setName(userRequest.getName());
 
-        return modelMapper.map(userRepository.save(user.get()), UserResponse.class);
+        userRepository.save(user.get());
+
+        return UserResponse.from(user.get());
     }
 
     @Override

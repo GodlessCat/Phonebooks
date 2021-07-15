@@ -15,7 +15,7 @@
                         startValue="1"/>
 
         <createTable tableName="USER">
-            <column name="USER_ID" type="bigint(20)" autoIncrement="true">
+            <column name="ID" type="bigint(20)" autoIncrement="true">
                 <constraints nullable="false" primaryKey="false" unique="true"/>
             </column>
             <column name="USER_NAME" type="varchar(100)">
@@ -33,7 +33,7 @@
                         startValue="1"/>
 
         <createTable tableName="ENTRY">
-            <column name="ENTRY_ID" type="bigint(20)" autoIncrement="true">
+            <column name="ID" type="bigint(20)" autoIncrement="true">
                 <constraints nullable="false" primaryKey="false" unique="true"/>
             </column>
             <column name="USER_ID" type="bigint(20)">

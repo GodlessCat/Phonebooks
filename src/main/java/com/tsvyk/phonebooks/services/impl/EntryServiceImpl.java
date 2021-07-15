@@ -9,7 +9,6 @@ import com.tsvyk.phonebooks.models.User;
 import com.tsvyk.phonebooks.repositories.EntryRepository;
 import com.tsvyk.phonebooks.repositories.UserRepository;
 import com.tsvyk.phonebooks.services.EntryService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +23,10 @@ public class EntryServiceImpl implements EntryService {
 
     private final UserRepository userRepository;
 
-    private final ModelMapper modelMapper;
-
     @Autowired
-    public EntryServiceImpl(EntryRepository entryRepository, UserRepository userRepository, ModelMapper modelMapper) {
+    public EntryServiceImpl(EntryRepository entryRepository, UserRepository userRepository) {
         this.entryRepository = entryRepository;
         this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -51,7 +47,7 @@ public class EntryServiceImpl implements EntryService {
         List<EntryResponse> entryResponses = new ArrayList<>();
 
         for (Entry entry : entries) {
-            entryResponses.add(modelMapper.map(entry, EntryResponse.class));
+            entryResponses.add(EntryResponse.from(entry));
         }
 
         return entryResponses;
@@ -66,7 +62,7 @@ public class EntryServiceImpl implements EntryService {
             throw new NotFoundException();
         }
 
-        return modelMapper.map(entry.get(), EntryResponse.class);
+        return EntryResponse.from(entry.get());
     }
 
     @Override
@@ -83,7 +79,7 @@ public class EntryServiceImpl implements EntryService {
 
         entryRepository.save(entry.get());
 
-        return modelMapper.map(entryRepository.findById(id).get(), EntryResponse.class);
+        return EntryResponse.from(entryRepository.findById(id).get());
     }
 
     @Override
@@ -101,11 +97,11 @@ public class EntryServiceImpl implements EntryService {
             throw new NotFoundException();
         }
 
-        Entry newEntry = entryRepository.save(new Entry(user.get().getUserId(),
+        Entry entry = entryRepository.save(new Entry(user.get().getId(),
                 entryRequest.getName(),
                 entryRequest.getNumber()));
 
-        return modelMapper.map(newEntry, EntryResponse.class);
+        return EntryResponse.from(entry);
     }
 
     @Override
@@ -120,7 +116,7 @@ public class EntryServiceImpl implements EntryService {
         List<EntryResponse> entryResponses = new ArrayList<>();
 
         for (Entry entry : entries) {
-            entryResponses.add(modelMapper.map(entry, EntryResponse.class));
+            entryResponses.add(EntryResponse.from(entry));
         }
 
         return entryResponses;

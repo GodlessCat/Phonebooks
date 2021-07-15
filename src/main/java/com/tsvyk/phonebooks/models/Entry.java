@@ -18,8 +18,8 @@ public class Entry {
     @Id
     @SequenceGenerator(name = "ENTRY_SEQUENCE", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1, initialValue = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ENTRY_SEQUENCE")
-    @Column(name = "ENTRY_ID")
-    private long entryId;
+    @Column(name = "ID")
+    private long id;
 
     @NonNull
     @JsonIgnore
