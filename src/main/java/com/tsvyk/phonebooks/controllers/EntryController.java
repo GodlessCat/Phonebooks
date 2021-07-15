@@ -1,43 +1,40 @@
 package com.tsvyk.phonebooks.controllers;
 
+import com.tsvyk.phonebooks.exceptions.NoContentException;
 import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.entry.EntryResponse;
+import com.tsvyk.phonebooks.exceptions.NotFoundException;
 import com.tsvyk.phonebooks.services.EntryService;
-import com.tsvyk.phonebooks.utils.MappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("entries")
 public class EntryController {
 
-    @Autowired
-    private EntryService entryService;
+    private final EntryService entryService;
 
     @Autowired
-    private MappingUtils mappingUtils;
+    public EntryController(EntryService entryService) {
+        this.entryService = entryService;
+    }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<EntryResponse>> getAllEntries(@RequestParam(required = false) String number) {
 
         try {
-
-            List<EntryResponse> entries = entryService.getAllEntries(number).
-                    stream().map(mappingUtils::mapToEntryResponse).collect(Collectors.toList());
-
-            if (entries.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
+            List<EntryResponse> entries = entryService.getAllEntries(number);
 
             return new ResponseEntity<>(entries, HttpStatus.OK);
 
+        } catch (NoContentException e) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -45,15 +42,14 @@ public class EntryController {
     public ResponseEntity<EntryResponse> getEntryById(@PathVariable(name = "entryId") long entryId) {
 
         try {
-            EntryResponse entry = mappingUtils.mapToEntryResponse(entryService.getEntryById(entryId));
+            EntryResponse entry = entryService.getEntryById(entryId);
 
-            if (entry != null) {
-                return new ResponseEntity<>(entry, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(entry, HttpStatus.OK);
+
+        } catch (NoContentException e) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -62,15 +58,14 @@ public class EntryController {
                                                      @RequestBody EntryRequest entryRequest) {
 
         try {
-            EntryResponse newEntry = mappingUtils.mapToEntryResponse(entryService.updateEntry(entryId, entryRequest));
+            EntryResponse newEntry = entryService.updateEntry(entryId, entryRequest);
 
-            if (newEntry != null) {
-                return new ResponseEntity<>(newEntry, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(newEntry, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -81,8 +76,42 @@ public class EntryController {
             entryService.deleteEntryById(entryId);
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @PostMapping("/{userId}/new")
+    public ResponseEntity<EntryResponse> createEntry(@PathVariable("userId") long userId,
+                                                     @RequestBody EntryRequest entryRequest) {
+
+        try {
+
+            EntryResponse newEntry = entryService.createEntry(userId, entryRequest);
+
+            return new ResponseEntity<>(newEntry, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{userId}/all")
+    public ResponseEntity<List<EntryResponse>> getAllEntriesByUserId(@PathVariable(name = "userId") long userId) {
+
+        try {
+
+            List<EntryResponse> entries = entryService.getAllEntriesByUserId(userId);
+
+            return new ResponseEntity<>(entries, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

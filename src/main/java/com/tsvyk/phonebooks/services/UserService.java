@@ -1,26 +1,21 @@
 package com.tsvyk.phonebooks.services;
 
-import com.tsvyk.phonebooks.dto.entry.EntryRequest;
-
 import com.tsvyk.phonebooks.dto.user.UserRequest;
-import com.tsvyk.phonebooks.models.Entry;
-import com.tsvyk.phonebooks.models.User;
+import com.tsvyk.phonebooks.dto.user.UserResponse;
+import com.tsvyk.phonebooks.exceptions.NoContentException;
+import com.tsvyk.phonebooks.exceptions.NotFoundException;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<User> getAllUsers(String name);
+    List<UserResponse> getAllUsers(String name) throws NotFoundException, NoContentException;
 
-    User getUserById(long id);
+    UserResponse getUserById(long id) throws NotFoundException;
 
-    User createUser(UserRequest userRequest);
+    UserResponse createUser(UserRequest userRequest);
 
-    User updateUser(long id, UserRequest userRequest);
+    UserResponse updateUser(long id, UserRequest userRequest) throws NotFoundException;
 
     void deleteUser(long id);
-
-    Entry createEntry(long id, EntryRequest entryRequest);
-
-    List<Entry> getAllEntriesByUserId(long id);
 }

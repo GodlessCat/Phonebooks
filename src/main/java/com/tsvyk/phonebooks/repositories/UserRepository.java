@@ -9,7 +9,4 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByNameContaining(String name);
-
-    User findByUserId(long id);
-
 }

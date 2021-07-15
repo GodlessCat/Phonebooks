@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class EntryResponse {
 
-    long entryId;
+    private long entryId;
 
-    String name;
+    private String name;
 
-    String number;
+    private String number;
 }

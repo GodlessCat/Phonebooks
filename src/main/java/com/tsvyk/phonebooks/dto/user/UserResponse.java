@@ -8,4 +8,5 @@ public class UserResponse {
     private long userId;
 
     private String name;
+
 }

@@ -1,32 +1,39 @@
 package com.tsvyk.phonebooks.services.impl;
 
-import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.user.UserRequest;
-import com.tsvyk.phonebooks.models.Entry;
+import com.tsvyk.phonebooks.dto.user.UserResponse;
+import com.tsvyk.phonebooks.exceptions.NoContentException;
+import com.tsvyk.phonebooks.exceptions.NotFoundException;
 import com.tsvyk.phonebooks.models.User;
 import com.tsvyk.phonebooks.repositories.EntryRepository;
 import com.tsvyk.phonebooks.repositories.UserRepository;
 import com.tsvyk.phonebooks.services.UserService;
-import com.tsvyk.phonebooks.utils.MappingUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final EntryRepository entryRepository;
+
+    private final ModelMapper modelMapper;
 
     @Autowired
-    EntryRepository entryRepository;
-
-    @Autowired
-    MappingUtils mappingUtils;
+    public UserServiceImpl(UserRepository userRepository, EntryRepository entryRepository, ModelMapper modelMapper) {
+        this.userRepository = userRepository;
+        this.entryRepository = entryRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
-    public List<User> getAllUsers(String name) {
+    public List<UserResponse> getAllUsers(String name) throws NoContentException {
 
         List<User> users;
 
@@ -36,38 +43,52 @@ public class UserServiceImpl implements UserService {
             users = userRepository.findByNameContaining(name);
         }
 
+        if (users.isEmpty()) {
+            throw new NoContentException();
+        }
 
-        return users;
+        List<UserResponse> userResponses = new ArrayList<>();
+
+        for (User user : users) {
+            userResponses.add(modelMapper.map(user, UserResponse.class));
+        }
+
+        return userResponses;
     }
 
     @Override
-    public User getUserById(long id) {
+    public UserResponse getUserById(long id) throws NotFoundException {
 
-        return userRepository.findByUserId(id);
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        return modelMapper.map(user.get(), UserResponse.class);
     }
 
     @Override
-    public User createUser(UserRequest userRequest) {
+    public UserResponse createUser(UserRequest userRequest) {
 
         User newUser = new User();
         newUser.setName(userRequest.getName());
 
-        return userRepository.save(newUser);
+        return modelMapper.map(userRepository.save(newUser), UserResponse.class);
     }
 
     @Override
-    public User updateUser(long id, UserRequest userRequest) {
+    public UserResponse updateUser(long id, UserRequest userRequest) throws NotFoundException {
 
-        User user = userRepository.findByUserId(id);
+        Optional<User> user = userRepository.findById(id);
 
-        if (user != null) {
-
-            user.setName(userRequest.getName());
-
-            userRepository.save(user);
+        if (user.isEmpty()) {
+            throw new NotFoundException();
         }
 
-        return userRepository.findByUserId(id);
+        user.get().setName(userRequest.getName());
+
+        return modelMapper.map(userRepository.save(user.get()), UserResponse.class);
     }
 
     @Override
@@ -75,27 +96,5 @@ public class UserServiceImpl implements UserService {
 
         entryRepository.deleteAll(entryRepository.findByUserId(id));
         userRepository.deleteById(id);
-    }
-
-    @Override
-    public Entry createEntry(long userId, EntryRequest entryRequest) {
-
-        User user = userRepository.findByUserId(userId);
-
-        Entry newEntry = null;
-
-        if (user != null) {
-            newEntry = entryRepository.save(new Entry(user.getUserId(),
-                    entryRequest.getName(),
-                    entryRequest.getNumber()));
-        }
-
-        return newEntry;
-    }
-
-    @Override
-    public List<Entry> getAllEntriesByUserId(long id) {
-
-        return entryRepository.findByUserId(id);
     }
 }

@@ -5,7 +5,8 @@ import lombok.Data;
 @Data
 public class EntryRequest {
 
-    String name;
+    private String name;
 
-    String number;
+    private String number;
+
 }

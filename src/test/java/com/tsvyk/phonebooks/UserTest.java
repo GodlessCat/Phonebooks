@@ -1,10 +1,10 @@
 package com.tsvyk.phonebooks;
 
-import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.user.UserRequest;
-import com.tsvyk.phonebooks.models.Entry;
+import com.tsvyk.phonebooks.dto.user.UserResponse;
+import com.tsvyk.phonebooks.exceptions.NoContentException;
+import com.tsvyk.phonebooks.exceptions.NotFoundException;
 import com.tsvyk.phonebooks.models.User;
-import com.tsvyk.phonebooks.repositories.EntryRepository;
 import com.tsvyk.phonebooks.repositories.UserRepository;
 import com.tsvyk.phonebooks.services.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -29,19 +29,16 @@ public class UserTest {
     @Autowired
     private UserServiceImpl userService;
 
-    @MockBean
-    private EntryRepository entryRepository;
-
     @Test
     @DisplayName("Test find all users")
-    void testFindAll() {
+    void testFindAll() throws NoContentException {
 
         User user1 = new User("John");
         User user2 = new User("Jack");
 
         when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
 
-        List<User> users = userService.getAllUsers(null);
+        List<UserResponse> users = userService.getAllUsers(null);
 
         assertEquals(2, users.size());
         assertEquals("John", users.get(0).getName());
@@ -53,14 +50,14 @@ public class UserTest {
 
     @Test
     @DisplayName("Test find user by id")
-    void testFindById() {
+    void testFindById() throws NotFoundException {
 
-        when(userRepository.findByUserId(0L)).thenReturn(new User("John"));
+        when(userRepository.findById(0L)).thenReturn(java.util.Optional.of(new User("John")));
 
-        User userById = userService.getUserById(0L);
+        UserResponse userById = userService.getUserById(0L);
 
         assertEquals("John", userById.getName());
-        verify(userRepository, times(1)).findByUserId(0L);
+        verify(userRepository, times(1)).findById(0L);
     }
 
     @Test
@@ -72,7 +69,7 @@ public class UserTest {
 
         when(userRepository.save(any())).thenReturn(new User("John"));
 
-        User created = userService.createUser(userRequest);
+        UserResponse created = userService.createUser(userRequest);
 
         assertEquals("John", created.getName());
         verify(userRepository, times(1)).save(any());
@@ -80,19 +77,19 @@ public class UserTest {
 
     @Test
     @DisplayName("Test update user")
-    public void testUpdateUser() {
+    public void testUpdateUser() throws NotFoundException {
 
         UserRequest userRequest = new UserRequest();
         userRequest.setName("John");
 
-        when(userRepository.findByUserId(0L)).thenReturn(new User("Steve"));
+        when(userRepository.findById(0L)).thenReturn(java.util.Optional.of(new User("Steve")));
         when(userRepository.save(any())).thenReturn(new User("John"));
 
-        User updated = userService.updateUser(0L, userRequest);
+        UserResponse updated = userService.updateUser(0L, userRequest);
 
         assertEquals("John", updated.getName());
 
-        verify(userRepository, times(2)).findByUserId(0L);
+        verify(userRepository, times(1)).findById(0L);
         verify(userRepository, times(1)).save(any());
     }
 
@@ -105,40 +102,4 @@ public class UserTest {
         verify(userRepository, times(1)).deleteById(0L);
     }
 
-    @Test
-    @DisplayName("Test create entry")
-    public void testCreateEntry() {
-
-        EntryRequest entryRequest = new EntryRequest();
-        entryRequest.setName("Jack");
-        entryRequest.setNumber("88005553535");
-
-        when(userRepository.findByUserId(0L)).thenReturn(new User("John"));
-        when(entryRepository.save(any())).thenReturn(new Entry(0, "Jack", "88005553535"));
-
-        Entry created = userService.createEntry(0L, entryRequest);
-
-        assertEquals("Jack", created.getName());
-        verify(userRepository, times(1)).findByUserId(0L);
-        verify(entryRepository, times(1)).save(any());
-    }
-
-    @Test
-    @DisplayName("Test get all entry by user id")
-    public void testGetAllEntryByUserId() {
-
-        Entry entry1 = new Entry(0, "Jack", "88005553535");
-        Entry entry2 = new Entry(0, "John", "89623822238");
-
-        when(entryRepository.findByUserId(0L)).thenReturn(Arrays.asList(entry1, entry2));
-
-        List<Entry> entries = userService.getAllEntriesByUserId(0L);
-
-        assertEquals(2, entries.size());
-        assertEquals("Jack", entries.get(0).getName());
-        assertEquals("John", entries.get(1).getName());
-
-        verify(entryRepository, times(1)).findByUserId(0L);
-
-    }
 }

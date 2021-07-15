@@ -12,24 +12,25 @@ import javax.persistence.*;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Entry")
+@Table(name = "ENTRY")
 public class Entry {
 
     @Id
-    @SequenceGenerator(name = "jpaSequence", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1, initialValue = 1)
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "jpaSequence")
-    long entryId;
+    @SequenceGenerator(name = "ENTRY_SEQUENCE", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1, initialValue = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ENTRY_SEQUENCE")
+    @Column(name = "ENTRY_ID")
+    private long entryId;
 
     @NonNull
     @JsonIgnore
     @Column(name = "USER_ID")
-    long userId;
+    private long userId;
 
     @NonNull
-    @Column(name = "ENTRY_NAME")
-    String name;
+    @Column(name = "ENTRY_NAME", length = 100, nullable = false)
+    private String name;
 
     @NonNull
     @Column(name = "ENTRY_NUMBER", length = 11)
-    String number;
+    private String number;
 }
