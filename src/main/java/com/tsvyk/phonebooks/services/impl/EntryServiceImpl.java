@@ -66,7 +66,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
-    public EntryResponse updateEntry(long id, EntryRequest entryRequest) throws NotFoundException {
+    public EntryResponse updateEntryById(long id, EntryRequest entryRequest) throws NotFoundException {
 
         Optional<Entry> entry = entryRepository.findById(id);
 

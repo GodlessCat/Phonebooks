@@ -1,50 +1,71 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-    <changeSet author="TsvykIlya" id="changelog-1.0">
-        <createSequence catalogName="cat"
-                        cycle="true"
-                        incrementBy="1"
-                        minValue="1"
-                        ordered="true"
-                        schemaName="public"
-                        sequenceName="USER_SEQUENCE"
-                        startValue="1"/>
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<databaseChangeLog-->
+<!--        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"-->
+<!--        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+<!--        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-->
+<!--                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">-->
+<!--    <changeSet author="TsvykIlya" id="changelog-1.0">-->
+<!--        <createSequence catalogName="cat"-->
+<!--                        cycle="true"-->
+<!--                        incrementBy="1"-->
+<!--                        minValue="1"-->
+<!--                        ordered="true"-->
+<!--                        schemaName="public"-->
+<!--                        sequenceName="USER_SEQUENCE"-->
+<!--                        startValue="1"/>-->
 
-        <createTable tableName="USER">
-            <column name="ID" type="bigint(20)" autoIncrement="true">
-                <constraints nullable="false" primaryKey="false" unique="true"/>
-            </column>
-            <column name="USER_NAME" type="varchar(100)">
-                <constraints nullable="false" primaryKey="false" unique="false"/>
-            </column>
-        </createTable>
+<!--        <createTable tableName="USER">-->
+<!--            <column name="ID" type="bigint(20)" autoIncrement="true">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="true"/>-->
+<!--            </column>-->
+<!--            <column name="USER_NAME" type="varchar(100)">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
 
-        <createSequence catalogName="cat"
-                        cycle="true"
-                        incrementBy="1"
-                        minValue="1"
-                        ordered="true"
-                        schemaName="public"
-                        sequenceName="ENTRY_SEQUENCE"
-                        startValue="1"/>
+<!--        <createSequence catalogName="cat"-->
+<!--                        cycle="true"-->
+<!--                        incrementBy="1"-->
+<!--                        minValue="1"-->
+<!--                        ordered="true"-->
+<!--                        schemaName="public"-->
+<!--                        sequenceName="ENTRY_SEQUENCE"-->
+<!--                        startValue="1"/>-->
 
-        <createTable tableName="ENTRY">
-            <column name="ID" type="bigint(20)" autoIncrement="true">
-                <constraints nullable="false" primaryKey="false" unique="true"/>
-            </column>
-            <column name="USER_ID" type="bigint(20)">
-                <constraints nullable="false" primaryKey="false" unique="false"/>
-            </column>
-            <column name="ENTRY_NAME" type="varchar(100)">
-                <constraints nullable="false" primaryKey="false" unique="false"/>
-            </column>
-            <column name="ENTRY_NUMBER" type="varchar(11)">
-                <constraints nullable="false" primaryKey="false" unique="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-</databaseChangeLog>
+<!--        <createTable tableName="ENTRY">-->
+<!--            <column name="ID" type="bigint(20)" autoIncrement="true">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="true"/>-->
+<!--            </column>-->
+<!--            <column name="USER_ID" type="bigint(20)">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="false"/>-->
+<!--            </column>-->
+<!--            <column name="ENTRY_NAME" type="varchar(100)">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="false"/>-->
+<!--            </column>-->
+<!--            <column name="ENTRY_NUMBER" type="varchar(11)">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+
+<!--        <createSequence catalogName="cat"-->
+<!--                        cycle="true"-->
+<!--                        incrementBy="1"-->
+<!--                        minValue="1"-->
+<!--                        ordered="true"-->
+<!--                        schemaName="public"-->
+<!--                        sequenceName="ADDRESS_SEQUENCE"-->
+<!--                        startValue="1"/>-->
+
+<!--        <createTable tableName="ADDRESS">-->
+<!--            <column name="ID" type="bigint(20)" autoIncrement="true">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="true"/>-->
+<!--            </column>-->
+<!--            <column name="ADDRESS_NAME" type="bigint(100)">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="true"/>-->
+<!--            </column>-->
+<!--            <column name="USER_ADDRESS" type="varchar(100)">-->
+<!--                <constraints nullable="false" primaryKey="false" unique="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+<!--</databaseChangeLog>-->

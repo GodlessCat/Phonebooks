@@ -4,10 +4,8 @@ import com.tsvyk.phonebooks.exceptions.NoContentException;
 import com.tsvyk.phonebooks.dto.entry.EntryRequest;
 import com.tsvyk.phonebooks.dto.entry.EntryResponse;
 import com.tsvyk.phonebooks.exceptions.NotFoundException;
-import com.tsvyk.phonebooks.models.Entry;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface EntryService {
 
@@ -15,7 +13,7 @@ public interface EntryService {
 
     EntryResponse getEntryById(long id) throws NoContentException, NotFoundException;
 
-    EntryResponse updateEntry(long id, EntryRequest entryRequest) throws NoContentException, NotFoundException;
+    EntryResponse updateEntryById(long id, EntryRequest entryRequest) throws NoContentException, NotFoundException;
 
     void deleteEntryById(long id);
 

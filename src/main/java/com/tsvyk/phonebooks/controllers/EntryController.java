@@ -54,11 +54,11 @@ public class EntryController {
     }
 
     @PutMapping("/{entryId}")
-    public ResponseEntity<EntryResponse> updateEntry(@PathVariable("entryId") long entryId,
+    public ResponseEntity<EntryResponse> updateEntryById(@PathVariable("entryId") long entryId,
                                                      @RequestBody EntryRequest entryRequest) {
 
         try {
-            EntryResponse newEntry = entryService.updateEntry(entryId, entryRequest);
+            EntryResponse newEntry = entryService.updateEntryById(entryId, entryRequest);
 
             return new ResponseEntity<>(newEntry, HttpStatus.OK);
 
@@ -70,7 +70,7 @@ public class EntryController {
     }
 
     @DeleteMapping("/{entryId}")
-    public ResponseEntity<HttpStatus> deleteEntry(@PathVariable("entryId") long entryId) {
+    public ResponseEntity<HttpStatus> deleteEntryById(@PathVariable("entryId") long entryId) {
 
         try {
             entryService.deleteEntryById(entryId);

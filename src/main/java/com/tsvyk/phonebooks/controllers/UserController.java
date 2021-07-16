@@ -1,9 +1,12 @@
 package com.tsvyk.phonebooks.controllers;
 
-import com.tsvyk.phonebooks.dto.user.UserRequest;
+import com.tsvyk.phonebooks.dto.address.AddressResponse;
+import com.tsvyk.phonebooks.dto.user.UserNameNumber;
 import com.tsvyk.phonebooks.dto.user.UserResponse;
 import com.tsvyk.phonebooks.exceptions.NoContentException;
 import com.tsvyk.phonebooks.exceptions.NotFoundException;
+import com.tsvyk.phonebooks.models.User;
+import com.tsvyk.phonebooks.services.AddressService;
 import com.tsvyk.phonebooks.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,14 +56,17 @@ public class UserController {
         }
     }
 
-    @PostMapping("")
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) {
+    @PostMapping("/new")
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserNameNumber userNameNumber) {
 
         try {
-            UserResponse newUser = userService.createUser(userRequest);
+
+            UserResponse newUser = userService.createUser(userNameNumber);
 
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
 
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -68,12 +74,11 @@ public class UserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable("userId") long userId,
-                                                   @RequestBody UserRequest updateUser) {
-
+                                                   @RequestBody UserNameNumber userNameNumber) {
         try {
-            UserResponse newUser = userService.updateUser(userId, updateUser);
+            UserResponse user = userService.updateUserById(userId, userNameNumber);
 
-            return new ResponseEntity<>(newUser, HttpStatus.OK);
+            return new ResponseEntity<>(user, HttpStatus.OK);
 
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -86,10 +91,58 @@ public class UserController {
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("userId") long userId) {
 
         try {
-            userService.deleteUser(userId);
+            userService.deleteUserById(userId);
 
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/address{addressId}/all")
+    public ResponseEntity<List<UserResponse>> getAllUsersByAddressId(@PathVariable(name = "addressId") long addressId) {
+
+        try {
+
+            List<UserResponse> users = userService.getAllUsersByAddressId(addressId);
+
+            return new ResponseEntity<>(users, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{userId}/addUser/{addressId}")
+    public ResponseEntity<UserResponse> addUserToAddress(@PathVariable("userId") long userId,
+                                                 @PathVariable("addressId") long addressId) {
+
+        try {
+            UserResponse userResponse = userService.addAddressToUser(userId, addressId);
+
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{addressId}/deleteUser/{userId}")
+    public ResponseEntity<UserResponse> deleteUserFromAddress(@PathVariable("addressId") long addressId,
+                                                                 @PathVariable("userId") long userId) {
+
+        try {
+            UserResponse userResponse = userService.deleteAddressFromUser(userId, addressId);
+
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

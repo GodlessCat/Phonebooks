@@ -12,11 +12,11 @@ import javax.persistence.*;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "ENTRY")
+@Table(name = "ENTRIES")
 public class Entry {
 
     @Id
-    @SequenceGenerator(name = "ENTRY_SEQUENCE", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1, initialValue = 1)
+    @SequenceGenerator(name = "ENTRY_SEQUENCE", sequenceName = "ENTRY_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ENTRY_SEQUENCE")
     @Column(name = "ID")
     private long id;
@@ -33,4 +33,5 @@ public class Entry {
     @NonNull
     @Column(name = "ENTRY_NUMBER", length = 11)
     private String number;
+
 }
