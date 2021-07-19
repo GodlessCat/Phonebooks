@@ -1,6 +1,5 @@
 package com.tsvyk.phonebooks.services;
 
-import com.tsvyk.phonebooks.dto.address.AddressRequest;
 import com.tsvyk.phonebooks.dto.address.AddressResponse;
 import com.tsvyk.phonebooks.dto.address.AddressStreetNumber;
 import com.tsvyk.phonebooks.exceptions.NoContentException;
@@ -13,13 +12,9 @@ public interface AddressService {
 
     AddressResponse getAddressById(long id) throws NoContentException, NotFoundException;
 
-    AddressResponse createAddress(AddressStreetNumber addressStreetNumber);
+    AddressStreetNumber createAddress(AddressStreetNumber addressStreetNumber);
 
     AddressResponse updateAddress(long id, AddressStreetNumber addressStreetNumber) throws NotFoundException;
 
     void deleteAddressById(long id);
-
-    AddressResponse addUserToAddress(long addressId, long userId) throws NotFoundException;
-
-    AddressResponse deleteUserFromAddress(long addressId, long userId) throws NotFoundException;
 }

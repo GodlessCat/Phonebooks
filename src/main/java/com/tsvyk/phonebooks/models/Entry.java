@@ -1,10 +1,6 @@
 package com.tsvyk.phonebooks.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -22,7 +18,6 @@ public class Entry {
     private long id;
 
     @NonNull
-    @JsonIgnore
     @Column(name = "USER_ID")
     private long userId;
 
@@ -33,5 +28,4 @@ public class Entry {
     @NonNull
     @Column(name = "ENTRY_NUMBER", length = 11)
     private String number;
-
 }

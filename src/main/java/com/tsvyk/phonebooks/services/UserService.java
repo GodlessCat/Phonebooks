@@ -13,13 +13,11 @@ public interface UserService {
 
     UserResponse getUserById(long id) throws NotFoundException;
 
-    UserResponse createUser(UserNameNumber userNameNumber) throws NotFoundException;
+    UserNameNumber createUser(UserNameNumber userNameNumber) throws NotFoundException;
 
     UserResponse updateUserById(long id, UserNameNumber userNameNumber) throws NotFoundException;
 
     void deleteUserById(long id);
-
-    List<UserResponse> getAllUsersByAddressId(long id) throws NotFoundException, NoContentException;
 
     UserResponse addAddressToUser(long userId, long addressId) throws NotFoundException;
 

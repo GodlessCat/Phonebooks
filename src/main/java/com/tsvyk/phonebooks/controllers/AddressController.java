@@ -1,6 +1,5 @@
 package com.tsvyk.phonebooks.controllers;
 
-import com.tsvyk.phonebooks.dto.address.AddressRequest;
 import com.tsvyk.phonebooks.dto.address.AddressResponse;
 import com.tsvyk.phonebooks.dto.address.AddressStreetNumber;
 import com.tsvyk.phonebooks.exceptions.NoContentException;
@@ -55,11 +54,11 @@ public class AddressController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<AddressResponse> createAddress(@RequestBody AddressStreetNumber addressStreetNumber) {
+    public ResponseEntity<AddressStreetNumber> createAddress(@RequestBody AddressStreetNumber addressStreetNumber) {
 
         try {
 
-            AddressResponse addressResponse = addressService.createAddress(addressStreetNumber);
+            AddressStreetNumber addressResponse = addressService.createAddress(addressStreetNumber);
 
             return new ResponseEntity<>(addressResponse, HttpStatus.CREATED);
 
@@ -94,38 +93,6 @@ public class AddressController {
 
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PutMapping("/{addressId}/addUser/{userId}")
-    public ResponseEntity<AddressResponse> addUserToAddress(@PathVariable("addressId") long addressId,
-                                                            @PathVariable("userId") long userId) {
-
-        try {
-            AddressResponse addressResponse = addressService.addUserToAddress(addressId, userId);
-
-            return new ResponseEntity<>(addressResponse, HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PutMapping("/{addressId}/deleteUser/{userId}")
-    public ResponseEntity<AddressResponse> deleteUserFromAddress(@PathVariable("addressId") long addressId,
-                                                            @PathVariable("userId") long userId) {
-
-        try {
-            AddressResponse addressResponse = addressService.deleteUserFromAddress(addressId, userId);
-
-            return new ResponseEntity<>(addressResponse, HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.tsvyk.phonebooks.dto.address;
 
-import com.tsvyk.phonebooks.dto.user.UserResponse;
+import com.tsvyk.phonebooks.dto.user.UserNameNumber;
 import com.tsvyk.phonebooks.models.Address;
 import com.tsvyk.phonebooks.models.User;
 import lombok.Builder;
@@ -15,22 +15,22 @@ public class AddressResponse {
 
     private int number;
 
-    private String name;
+    private String street;
 
-    private Set<UserResponse> userResponses;
+    private Set<UserNameNumber> userNameNumbers;
 
     public static AddressResponse from(Address address) {
 
-        Set<UserResponse> userResponses = new HashSet<>();
+        Set<UserNameNumber> userNameNumbers = new HashSet<>();
 
         for (User user : address.getUsers()){
-            userResponses.add(UserResponse.from(user));
+            userNameNumbers.add(UserNameNumber.from(user));
         }
 
         return AddressResponse.builder()
-                .name(address.getStreet())
+                .street(address.getStreet())
                 .number(address.getNumber())
-                .userResponses(userResponses)
+                .userNameNumbers(userNameNumbers)
                 .build();
     }
 }

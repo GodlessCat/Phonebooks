@@ -1,9 +1,6 @@
 package com.tsvyk.phonebooks.services.impl;
 
-import com.tsvyk.phonebooks.dto.address.AddressResponse;
-import com.tsvyk.phonebooks.dto.address.AddressStreetNumber;
 import com.tsvyk.phonebooks.dto.user.UserNameNumber;
-import com.tsvyk.phonebooks.dto.user.UserRequest;
 import com.tsvyk.phonebooks.dto.user.UserResponse;
 import com.tsvyk.phonebooks.exceptions.NoContentException;
 import com.tsvyk.phonebooks.exceptions.NotFoundException;
@@ -69,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse createUser(UserNameNumber userNameNumber) throws NotFoundException {
+    public UserNameNumber createUser(UserNameNumber userNameNumber) throws NotFoundException {
 
         User user = new User();
         user.setName(userNameNumber.getName());
@@ -78,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return UserResponse.from(user);
+        return UserNameNumber.from(user);
     }
 
     @Override
@@ -105,29 +102,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    public List<UserResponse> getAllUsersByAddressId(long id) throws NotFoundException {
-
-        Optional<Address> address = addressRepository.findById(id);
-
-        if (address.isEmpty()) {
-            throw new NotFoundException();
-        }
-
-        Set<User> users = address.get().getUsers();
-
-        if (users.isEmpty()) {
-            throw new NotFoundException();
-        }
-
-        List<UserResponse> userResponses = new ArrayList<>();
-
-        for (User user : users) {
-            userResponses.add(UserResponse.from(user));
-        }
-
-        return userResponses;
-    }
-
     @Override
     public UserResponse addAddressToUser(long userId, long addressId) throws NotFoundException {
 
@@ -140,10 +114,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException();
         }
 
-        Set<Address> addresses = user.get().getAddresses();
-        addresses.add(address.get());
-
-        user.get().setAddresses(addresses);
+        user.get().addAddress(address.get());
 
         return UserResponse.from(userRepository.save(user.get()));
     }
@@ -160,10 +131,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException();
         }
 
-        Set<Address> addresses = user.get().getAddresses();
-        addresses.remove(address.get());
-
-        user.get().setAddresses(addresses);
+        user.get().removeAddress(address.get());
 
         return UserResponse.from(userRepository.save(user.get()));
     }

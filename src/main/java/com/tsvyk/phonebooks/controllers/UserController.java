@@ -57,11 +57,11 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserNameNumber userNameNumber) {
+    public ResponseEntity<UserNameNumber> createUser(@RequestBody UserNameNumber userNameNumber) {
 
         try {
 
-            UserResponse newUser = userService.createUser(userNameNumber);
+            UserNameNumber newUser = userService.createUser(userNameNumber);
 
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
 
@@ -100,24 +100,8 @@ public class UserController {
         }
     }
 
-    @GetMapping("/address{addressId}/all")
-    public ResponseEntity<List<UserResponse>> getAllUsersByAddressId(@PathVariable(name = "addressId") long addressId) {
-
-        try {
-
-            List<UserResponse> users = userService.getAllUsersByAddressId(addressId);
-
-            return new ResponseEntity<>(users, HttpStatus.OK);
-
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @PutMapping("/{userId}/addUser/{addressId}")
-    public ResponseEntity<UserResponse> addUserToAddress(@PathVariable("userId") long userId,
+    public ResponseEntity<UserResponse> addAddressToUser(@PathVariable("userId") long userId,
                                                  @PathVariable("addressId") long addressId) {
 
         try {
@@ -133,7 +117,7 @@ public class UserController {
     }
 
     @PutMapping("/{addressId}/deleteUser/{userId}")
-    public ResponseEntity<UserResponse> deleteUserFromAddress(@PathVariable("addressId") long addressId,
+    public ResponseEntity<UserResponse> deleteAddressFromUser(@PathVariable("addressId") long addressId,
                                                                  @PathVariable("userId") long userId) {
 
         try {
