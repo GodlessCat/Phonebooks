@@ -1,77 +1,131 @@
 package com.tsvyk.phonebooks;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
+import com.tsvyk.phonebooks.dto.entry.EntryRequest;
+import com.tsvyk.phonebooks.dto.entry.EntryResponse;
+import com.tsvyk.phonebooks.exceptions.NoContentException;
+import com.tsvyk.phonebooks.exceptions.NotFoundException;
 import com.tsvyk.phonebooks.models.Entry;
 import com.tsvyk.phonebooks.models.User;
 import com.tsvyk.phonebooks.repositories.EntryRepository;
 import com.tsvyk.phonebooks.repositories.UserRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.tsvyk.phonebooks.services.impl.EntryServiceImpl;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-@RunWith(SpringRunner.class)
-@DataJpaTest
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+@SpringBootTest
 public class EntryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+    @MockBean
+    private EntryRepository entryRepository;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    EntryRepository entryRepository;
+    private EntryServiceImpl entryService;
 
     @Test
-    public void test_showing_no_content_if_no_entries_was_creating() {
-        Iterable<Entry> entries = entryRepository.findAll();
+    @DisplayName("Test get all entries")
+    public void testGetAllEntries() throws NoContentException {
 
-        assertThat(entries).isEmpty();
+        Entry entry1 = new Entry(0, "Jack", "88005553535");
+        Entry entry2 = new Entry(0, "John", "89623822238");
+
+        when(entryRepository.findAll()).thenReturn(Arrays.asList(entry1, entry2));
+
+        List<EntryResponse> entries = entryService.getAllEntries(null);
+
+        assertEquals(2, entries.size());
+        assertEquals("Jack", entries.get(0).getName());
+        assertEquals("John", entries.get(1).getName());
+
+        verify(entryRepository, times(1)).findAll();
     }
 
     @Test
-    public void test_save_a_new_entry() {
-        User user1 = userRepository.save(new User("John"));
+    @DisplayName("Test get entry by id")
+    public void testGetEntryById() throws NotFoundException {
 
-        Entry entry = entryRepository.save(new Entry(user1.getUserId(), "Jack", "+79123456789"));
+        when(entryRepository.findById(0L)).thenReturn(java.util.Optional.of(new Entry(0, "Jack", "88005553535")));
 
-        assertThat(entry).hasFieldOrPropertyWithValue("name", "Jack");
-        assertThat(entry).hasFieldOrPropertyWithValue("number", "+79123456789");
-        assertThat(entry).hasFieldOrPropertyWithValue("userId", user1.getUserId());
+        EntryResponse entryById = entryService.getEntryById(0L);
 
+        assertEquals("Jack", entryById.getName());
+        verify(entryRepository, times(1)).findById(0L);
     }
 
     @Test
-    public void test_showing_entry_by_id() {
-        Entry entry1 = new Entry(1, "Jack", "+79123456789");
-        entityManager.persist(entry1);
+    @DisplayName("Test update entry")
+    public void testUpdateEntry() throws NotFoundException {
 
-        Entry foundEntry = entryRepository.findById(entry1.getEntryId()).get();
+        EntryRequest entryRequest = new EntryRequest();
+        entryRequest.setName("John");
+        entryRequest.setNumber("89623822238");
 
-        assertThat(foundEntry).isEqualTo(entry1);
+        when(entryRepository.findById(0L)).thenReturn(Optional.of(new Entry(0, "Jack", "88005553535")));
+        when(entryRepository.save(any())).thenReturn(new Entry(0, "John", "89623822238"));
+
+        EntryResponse updated = entryService.updateEntryById(0L, entryRequest);
+
+        assertEquals("John", updated.getName());
+
+        verify(entryRepository, times(2)).findById(0L);
+        verify(entryRepository, times(1)).save(any());
     }
 
     @Test
-    public void test_update_enry_by_id() {
-        Entry entry1 = new Entry(1, "Jack", "+79123456789");
-        entityManager.persist(entry1);
+    @DisplayName("Test delete entry by id")
+    public void testDeleteEntryById() {
 
-        Entry entry2 = new Entry(1, "Jack", "+79321654987");
+        entryService.deleteEntryById(0L);
 
-        Entry entry = entryRepository.findById(entry1.getEntryId()).get();
-        entry.setName(entry2.getName());
-        entry.setName(entry2.getNumber());
-        entryRepository.save(entry);
+        verify(entryRepository, times(1)).deleteById(0L);
+    }
 
-        Entry checkEntry = entryRepository.findById(entry1.getEntryId()).get();
+    @Test
+    @DisplayName("Test create entry")
+    public void testCreateEntry() throws NotFoundException {
 
-        assertThat(checkEntry.getEntryId()).isEqualTo(entry1.getEntryId());
-        assertThat(checkEntry.getUserId()).isEqualTo(entry1.getUserId());
-        assertThat(checkEntry.getName()).isEqualTo(entry1.getName());
-        assertThat(checkEntry.getNumber()).isEqualTo(entry1.getNumber());
+        EntryRequest entryRequest = new EntryRequest();
+        entryRequest.setName("Jack");
+        entryRequest.setNumber("88005553535");
+
+        when(userRepository.findById(0L)).thenReturn(java.util.Optional.of(new User("John", "89748546418")));
+        when(entryRepository.save(any())).thenReturn(new Entry(0, "Jack", "88005553535"));
+
+        EntryResponse created = entryService.createEntry(0L, entryRequest);
+
+        assertEquals("Jack", created.getName());
+        verify(userRepository, times(1)).findById(0L);
+        verify(entryRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Test get all entry by user id")
+    public void testGetAllEntryByUserId() throws NotFoundException {
+
+        Entry entry1 = new Entry(0, "Jack", "88005553535");
+        Entry entry2 = new Entry(0, "John", "89623822238");
+
+        when(entryRepository.findByUserId(0L)).thenReturn(Arrays.asList(entry1, entry2));
+
+        List<EntryResponse> entries = entryService.getAllEntriesByUserId(0L);
+
+        assertEquals(2, entries.size());
+        assertEquals("Jack", entries.get(0).getName());
+        assertEquals("John", entries.get(1).getName());
+
+        verify(entryRepository, times(1)).findByUserId(0L);
+
     }
 }

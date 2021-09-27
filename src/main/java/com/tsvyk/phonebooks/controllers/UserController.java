@@ -1,146 +1,134 @@
 package com.tsvyk.phonebooks.controllers;
 
-import com.tsvyk.phonebooks.models.Entry;
+import com.tsvyk.phonebooks.dto.address.AddressResponse;
+import com.tsvyk.phonebooks.dto.user.UserNameNumber;
+import com.tsvyk.phonebooks.dto.user.UserResponse;
+import com.tsvyk.phonebooks.exceptions.NoContentException;
+import com.tsvyk.phonebooks.exceptions.NotFoundException;
 import com.tsvyk.phonebooks.models.User;
-import com.tsvyk.phonebooks.repositories.EntryRepository;
-import com.tsvyk.phonebooks.repositories.UserRepository;
+import com.tsvyk.phonebooks.services.AddressService;
+import com.tsvyk.phonebooks.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("users")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    private EntryRepository entryRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    @GetMapping("")
-    public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) {
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers(@RequestParam(required = false) String name) {
+
         try {
-            List<User> users;
-
-            if (name == null) {
-                users = userRepository.findAll();
-            } else {
-                users = userRepository.findByNameContaining(name);
-            }
-
-            if (users.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
+            List<UserResponse> users = userService.getAllUsers(name);
 
             return new ResponseEntity<>(users, HttpStatus.OK);
 
+        } catch (NoContentException e) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable("userId") long userId) {
-        try {
-            Optional<User> user = userRepository.findById(userId);
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("userId") long userId) {
 
-            if (user.isPresent()) {
-                return new ResponseEntity<>(user.get(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+        try {
+            UserResponse user = userService.getUserById(userId);
+
+            return new ResponseEntity<>(user, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @PostMapping("/new")
+    public ResponseEntity<UserNameNumber> createUser(@RequestBody UserNameNumber userNameNumber) {
 
         try {
-            User newUser = userRepository.saveAndFlush(new User(user.getName()));
+
+            UserNameNumber newUser = userService.createUser(userNameNumber);
 
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable("userId") long userId, @RequestBody User updateUser) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("userId") long userId,
+                                                   @RequestBody UserNameNumber userNameNumber) {
         try {
-            Optional<User> user = userRepository.findById(userId);
+            UserResponse user = userService.updateUserById(userId, userNameNumber);
 
-            User newUser = null;
+            return new ResponseEntity<>(user, HttpStatus.OK);
 
-            if (user.isPresent()) {
-                newUser = user.get();
-                newUser.setName(updateUser.getName());
-                userRepository.save(newUser);
-            }
-
-            if (newUser != null) {
-                return new ResponseEntity<>(newUser, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("userId") long userId) {
+
         try {
-            userRepository.deleteById(userId);
-            entryRepository.deleteAll(entryRepository.findByUserId(userId));
+            userService.deleteUserById(userId);
+
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("/{userId}/entries")
-    public ResponseEntity<Entry> createEntry(@PathVariable("userId") long userId, @RequestBody Entry entry) {
+    @PutMapping("/{userId}/addUser/{addressId}")
+    public ResponseEntity<UserResponse> addAddressToUser(@PathVariable("userId") long userId,
+                                                 @PathVariable("addressId") long addressId) {
+
         try {
-            Optional<User> user = userRepository.findById(userId);
-            Entry newEntry = null;
+            UserResponse userResponse = userService.addAddressToUser(userId, addressId);
 
-            if (user.isPresent()) {
-                newEntry = entryRepository.saveAndFlush(new Entry(user.get().getUserId(), entry.getName(), entry.getNumber()));
-            }
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
 
-            if (newEntry == null) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            } else {
-                return new ResponseEntity<>(newEntry, HttpStatus.CREATED);
-            }
-
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/{userId}/entries")
-    public ResponseEntity<List<Entry>> getAllEntriesByUserId(@PathVariable(name = "userId") long userId) {
+    @PutMapping("/{addressId}/deleteUser/{userId}")
+    public ResponseEntity<UserResponse> deleteAddressFromUser(@PathVariable("addressId") long addressId,
+                                                                 @PathVariable("userId") long userId) {
 
         try {
+            UserResponse userResponse = userService.deleteAddressFromUser(userId, addressId);
 
-            List<Entry> entries = entryRepository.findByUserId(userId);
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
 
-            if (entries.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-
-            return new ResponseEntity<>(entries, HttpStatus.OK);
-
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

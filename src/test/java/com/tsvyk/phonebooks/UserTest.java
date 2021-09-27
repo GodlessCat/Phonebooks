@@ -1,116 +1,165 @@
 package com.tsvyk.phonebooks;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.tsvyk.phonebooks.dto.address.AddressStreetNumber;
+import com.tsvyk.phonebooks.dto.user.UserNameNumber;
+import com.tsvyk.phonebooks.dto.user.UserResponse;
+import com.tsvyk.phonebooks.exceptions.NoContentException;
+import com.tsvyk.phonebooks.exceptions.NotFoundException;
+import com.tsvyk.phonebooks.models.Address;
 import com.tsvyk.phonebooks.models.User;
-import com.tsvyk.phonebooks.repositories.EntryRepository;
+import com.tsvyk.phonebooks.repositories.AddressRepository;
 import com.tsvyk.phonebooks.repositories.UserRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.tsvyk.phonebooks.services.impl.UserServiceImpl;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-@RunWith(SpringRunner.class)
-@DataJpaTest
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@SpringBootTest
 public class UserTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private AddressRepository addressRepository;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    EntryRepository entryRepository;
+    private UserServiceImpl userService;
 
     @Test
-    public void test_showing_no_content_if_no_users_was_creating() {
-        Iterable<User> users = userRepository.findAll();
+    @DisplayName("Test find all users")
+    void testFindAll() throws NoContentException {
 
-        assertThat(users).isEmpty();
+        User user1 = new User("John", "88005553535");
+        User user2 = new User("Jack", "88005553536");
+
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
+
+        List<UserResponse> users = userService.getAllUsers(null);
+
+        assertEquals(2, users.size());
+        assertEquals("John", users.get(0).getName());
+        assertEquals("Jack", users.get(1).getName());
+
+        verify(userRepository, times(1)).findAll();
+    }
+
+
+    @Test
+    @DisplayName("Test find user by id")
+    void testFindById() throws NotFoundException {
+
+        when(userRepository.findById(0L)).thenReturn(java.util.Optional.of(new User("John", "88005553535")));
+
+        UserResponse userById = userService.getUserById(0L);
+
+        assertEquals("John", userById.getName());
+        verify(userRepository, times(1)).findById(0L);
     }
 
     @Test
-    public void test_save_a_new_user() {
-        User user = userRepository.save(new User("John"));
+    @DisplayName("Test create user")
+    public void testCreateUser() throws NotFoundException {
 
-        assertThat(user).hasFieldOrPropertyWithValue("name", "John");
+        UserNameNumber userNameNumber = new UserNameNumber("John", "88005553535");
+
+        when(userRepository.save(any())).thenReturn(new User("John", "88005553535"));
+
+        UserNameNumber created = userService.createUser(userNameNumber);
+
+        assertEquals("John", created.getName());
+        verify(userRepository, times(1)).save(any());
     }
 
     @Test
-    public void test_showing_all_users() {
-        User user1 = new User("John");
-        entityManager.persist(user1);
+    @DisplayName("Test update user")
+    public void testUpdateUser() throws NotFoundException {
 
-        User user2 = new User("Jack");
-        entityManager.persist(user2);
+        UserNameNumber userNameNumber = new UserNameNumber("John", "88005553535");
 
-        Iterable<User> users = userRepository.findAll();
 
-        assertThat(users).hasSize(2).contains(user1, user2);
+        when(userRepository.findById(0L)).thenReturn(java.util.Optional.of(new User("Steve", "88005553536")));
+        when(userRepository.save(any())).thenReturn(new User("John", "88005553535"));
+
+        UserResponse updated = userService.updateUserById(0L, userNameNumber);
+
+        assertEquals("John", updated.getName());
+
+        verify(userRepository, times(1)).findById(0L);
+        verify(userRepository, times(1)).save(any());
     }
 
     @Test
-    public void test_showing_user_by_id() {
-        User user1 = new User("John");
-        entityManager.persist(user1);
+    @DisplayName("Test delete user")
+    public void testDeleteUser() {
 
-        User user2 = new User("Jack");
-        entityManager.persist(user2);
+        userService.deleteUserById(0L);
 
-        User foundUser = userRepository.findById(user2.getUserId()).get();
-
-        assertThat(foundUser).isEqualTo(user2);
+        verify(userRepository, times(1)).deleteById(0L);
     }
 
     @Test
-    public void test_showing_users_by_part_of_name() {
-        User user1 = new User("John");
-        entityManager.persist(user1);
+    @DisplayName("Test add address to user")
+    public void testAddAddressToUser() throws NotFoundException {
 
-        User user2 = new User("Jack");
-        entityManager.persist(user2);
+        User user = new User("Steve", "88005553536");
+        Address address = new Address("Lenina", 1);
 
-        User user3 = new User("Joe");
-        entityManager.persist(user3);
+        when(userRepository.findById(1L)).
+                thenReturn(java.util.Optional.of(user));
+
+        when(addressRepository.findById(1L)).
+                thenReturn(java.util.Optional.of(address));
+
+        when(userRepository.save(any())).
+                thenReturn(user);
+
+        UserResponse userResponse = userService.addAddressToUser(1L, 1L);
+
+        AddressStreetNumber addressStreetNumber = AddressStreetNumber.from(address);
+
+        assertEquals(true, userResponse.getAddresses().contains(addressStreetNumber));
 
 
-        Iterable<User> users = userRepository.findByNameContaining("Jo");
-
-        assertThat(users).hasSize(2).contains(user1, user3);
+        verify(userRepository, times(1)).findById(1L);
+        verify(addressRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).save(any());
     }
 
     @Test
-    public void test_update_user_by_id() {
-        User user1 = new User("John");
-        entityManager.persist(user1);
+    @DisplayName("Test delete address from user")
+    public void testDeleteAddressFromUser() throws NotFoundException {
 
-        User updatedUser = new User("Joe");
+        User user = new User("Steve", "88005553536");
+        Address address = new Address("Lenina", 1);
+        user.addAddress(address);
 
-        User user = userRepository.findById(user1.getUserId()).get();
-        user.setName(updatedUser.getName());
-        userRepository.save(user);
+        when(userRepository.findById(1L)).
+                thenReturn(java.util.Optional.of(user));
 
-        User checkUser = userRepository.findById(user1.getUserId()).get();
+        when(addressRepository.findById(1L)).
+                thenReturn(java.util.Optional.of(address));
 
-        assertThat(checkUser.getUserId()).isEqualTo(user1.getUserId());
-        assertThat(checkUser.getName()).isEqualTo(user1.getName());
+        when(userRepository.save(any())).
+                thenReturn(user);
+
+        UserResponse userResponse = userService.deleteAddressFromUser(1L, 1L);
+        AddressStreetNumber addressStreetNumber = AddressStreetNumber.from(address);
+
+        assertEquals(false, userResponse.getAddresses().contains(addressStreetNumber));
+
+        verify(userRepository, times(1)).findById(1L);
+        verify(addressRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).save(any());
     }
 
-    @Test
-    public void test_delete_user_by_id() {
-        User user1 = new User("John");
-        entityManager.persist(user1);
-
-        User user2 = new User("Jack");
-        entityManager.persist(user2);
-
-        userRepository.deleteById(user2.getUserId());
-
-        Iterable<User> users = userRepository.findAll();
-
-        assertThat(users).hasSize(1).contains(user1);
-    }
 }
